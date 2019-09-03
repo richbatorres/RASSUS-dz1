@@ -12,6 +12,13 @@ public class Test {
 		
 		final String uri = "http://localhost:8080/serverProject/rest/sensors";
 		
+		JSONObject request = new JSONObject();
+		request.put("username", "tin");
+		request.put("lat", "10.10");
+		request.put("lon", "10.10");
+		request.put("IP", "10.10.10.10");
+		request.put("lat", "10.10");
+		
 		RestTemplate restTemplate = new RestTemplate();
 		String sensor = restTemplate.getForObject(uri, String.class);
 		/*for (Sensor sensor:sensors) {
