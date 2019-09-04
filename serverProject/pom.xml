@@ -39,6 +39,11 @@
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.library}</version>
     </dependency>
+    <dependency>
+    	<groupId>org.json</groupId>
+    	<artifactId>json</artifactId>
+    	<version>20180130</version>
+	</dependency>
   </dependencies>
   <properties>
        <maven.compiler.source>1.8</maven.compiler.source>

@@ -3,6 +3,8 @@ package hr.fer.serverProject;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONObject;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,35 +26,67 @@ public class ServiceController {
 	public List<Sensor> sensors = new ArrayList<Sensor>();
 	
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	public boolean register(@RequestParam(value = "username")String username, @RequestParam(value = "lat")double latitude, 
-			@RequestParam(value = "lon")double longitude, @RequestParam(value = "IP")String IPaddress, @RequestParam(value = "port")int port) {
+	public boolean register(@RequestBody String jsonStr) {
 		
-		Sensor sensor = new Sensor(username, latitude, longitude, IPaddress, port);
-		if (!sensors.contains(sensor)) {
-			sensors.add(sensor);
-			return true;
-		}else {
-			return false;
+		JSONObject jsonObject = new JSONObject(jsonStr);
+		String username = jsonObject.getString("username");
+		double lat = jsonObject.getDouble("lat");
+		double lon = jsonObject.getDouble("lon");
+		String ip = jsonObject.getString("IP");
+		int port = jsonObject.getInt("port");
+		for (Sensor sensor : sensors) {
+			if (sensor.getUsername().equals(username)) {
+				return false;
+			} 
 		}
+		Sensor sensor = new Sensor(username, lat, lon, ip, port);
+		sensors.add(sensor);
+		return true;
 		
 	}
 	
-	@RequestMapping(value = "/sensors", method = RequestMethod.GET)
-	public String listSensors(){
-		Sensor sensor = new Sensor("tin", 10.10, 10.10, "10.10.10.10", 8080);
-		
-		sensors.add(sensor);
-		//return new ResponseEntity<List>(sensors, HttpStatus.OK);
+	@RequestMapping(value = "/neighbour/{username}", method = RequestMethod.GET)
+	public String searchNeighbour(@RequestParam(value = "username")String username){
+		Sensor user = new Sensor();
+		for (Sensor s : sensors) {
+			if (s.getUsername().equals(username)) user = s;
+		}
+		int d = 0;
+		Sensor closest = new Sensor();
+		for (Sensor s : sensors) {
+			if (s.getUsername().equals(username)) continue;
+			int tempD = distance(user, s);
+			if (tempD < d || d == 0) closest = s;
+		}
+		UserAddress address = new UserAddress(closest.getIPaddress(), closest.getPort());
 		ObjectMapper Obj = new ObjectMapper();
-		String jsonStr = null;
 		try {
-			jsonStr = Obj.writeValueAsString(sensor);
+			return Obj.writeValueAsString(address);
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println(jsonStr);
-		return jsonStr;
+		return "failed";
+	}
+	
+	private int distance(Sensor user, Sensor s) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@RequestMapping(value = "/sensors", method = RequestMethod.GET)
+	public String listSensors(){
+		//return new ResponseEntity<List>(sensors, HttpStatus.OK);
+		ObjectMapper Obj = new ObjectMapper();
+		String jsonStr = null;
+		try {
+			jsonStr = Obj.writeValueAsString(sensors);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		//System.out.println(jsonStr);
+		return jsonStr.toString();
 	}	
 	
 }
