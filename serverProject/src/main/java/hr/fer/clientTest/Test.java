@@ -17,8 +17,10 @@ public class Test {
 
 	public static void main(String[] args) {
 		
-		reg();		
-		list();
+//		reg();		
+//		list();
+//		search();
+		store();
 		
 	}
 	
@@ -27,10 +29,30 @@ public class Test {
 		
 		JSONObject request = new JSONObject();
 		request.put("username", "Richbatorres");
-		request.put("lon", 10.10);
-		request.put("lat", 10.10);
-		request.put("IP", "10.10.10.10");
-		request.put("port", 10);
+		request.put("lon", 20.10);
+		request.put("lat", 50.10);
+		request.put("IP", "10.20.20.10");
+		request.put("port", 5);
+
+		// set headers
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<String> entity = new HttpEntity<String>(request.toString(), headers);
+		RestTemplate restTemplate = new RestTemplate();
+		
+		ResponseEntity<String> response = restTemplate
+				  .exchange(uri, HttpMethod.POST, entity, String.class);
+		//JSONObject userJson = new JSONObject(response.getBody());
+		System.out.println(response.getBody());
+	}
+	
+	public static void store() {
+		final String uri = "http://localhost:8080/serverProject/rest/measurment";
+		
+		JSONObject request = new JSONObject();
+		request.put("username", "Richbatorres");
+		request.put("parameter", "Pressure");
+		request.put("avgValue", 50.10);
 
 		// set headers
 		HttpHeaders headers = new HttpHeaders();
@@ -46,6 +68,19 @@ public class Test {
 	
 	public static void list() {
 		final String uri = "http://localhost:8080/serverProject/rest/sensors";
+		
+		HttpHeaders headers = new HttpHeaders();
+		HttpEntity<String> entity = new HttpEntity<String>("", headers);
+		RestTemplate restTemplate = new RestTemplate();
+		
+		ResponseEntity<String> response = restTemplate
+				  .exchange(uri, HttpMethod.GET, entity, String.class);
+		//JSONObject userJson = new JSONObject(response.getBody());
+		System.out.println(response.getBody());
+	}
+	
+	public static void search() {
+		final String uri = "http://localhost:8080/serverProject/rest/neighbour?username=torres";
 		
 		HttpHeaders headers = new HttpHeaders();
 		HttpEntity<String> entity = new HttpEntity<String>("", headers);

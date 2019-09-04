@@ -24,6 +24,7 @@ public class ServiceController {
 	private static final int POST_CODE_SUCCESS = 100;
 	private static final int AUTH_FAILURE = 102;
 	public List<Sensor> sensors = new ArrayList<Sensor>();
+	public List<String> usernames = new ArrayList<String>();
 	
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
 	public boolean register(@RequestBody String jsonStr) {
@@ -41,22 +42,43 @@ public class ServiceController {
 		}
 		Sensor sensor = new Sensor(username, lat, lon, ip, port);
 		sensors.add(sensor);
+		usernames.add(username);
 		return true;
 		
 	}
 	
-	@RequestMapping(value = "/neighbour/{username}", method = RequestMethod.GET)
+	@RequestMapping(value = "/measurment", method = RequestMethod.POST)
+	public boolean storeMeasurment(@RequestBody String jsonStr) {
+
+		JSONObject jsonObject = new JSONObject(jsonStr);
+		if (jsonObject.has("username") && jsonObject.has("parameter") && jsonObject.has("avgValue")) {
+			String username;
+			if (usernames.contains(jsonObject.getString("username"))) {
+				username = jsonObject.getString("username");
+			}else return false;
+			String parameter = jsonObject.getString("parameter");
+			float avgValue = jsonObject.getFloat("avgValue");
+			System.out.println(username + parameter + avgValue);
+			return true;
+		}else return false;
+		
+	}
+	
+	@RequestMapping(value = "/neighbour", method = RequestMethod.GET)
 	public String searchNeighbour(@RequestParam(value = "username")String username){
 		Sensor user = new Sensor();
 		for (Sensor s : sensors) {
 			if (s.getUsername().equals(username)) user = s;
 		}
-		int d = 0;
+		double d = 0;
 		Sensor closest = new Sensor();
 		for (Sensor s : sensors) {
 			if (s.getUsername().equals(username)) continue;
-			int tempD = distance(user, s);
-			if (tempD < d || d == 0) closest = s;
+			double tempD = distance(user, s);
+			if (tempD < d || d == 0) {
+				closest = s;
+				System.out.println("Distance between " + user.getUsername() + " and " + s.getUsername() + " is " + tempD);
+			}
 		}
 		UserAddress address = new UserAddress(closest.getIPaddress(), closest.getPort());
 		ObjectMapper Obj = new ObjectMapper();
@@ -69,9 +91,15 @@ public class ServiceController {
 		return "failed";
 	}
 	
-	private int distance(Sensor user, Sensor s) {
-		// TODO Auto-generated method stub
-		return 0;
+	private double distance(Sensor s1, Sensor s2) {
+		
+		int r = 6371;
+		double dlon = s2.getLongitude() - s1.getLongitude();
+		double dlat = s2.getLatitude() - s1.getLatitude();
+		double a = Math.pow(Math.sin(dlat/2), 2) + Math.cos(s1.getLatitude()) * Math.cos(s2.getLatitude()) * Math.pow(Math.sin(dlon/2), 2);
+		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+		return r*c;
+		
 	}
 
 	@RequestMapping(value = "/sensors", method = RequestMethod.GET)
