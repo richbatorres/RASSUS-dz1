@@ -11,7 +11,7 @@ public interface ServerIf {
 
 			// Server shutdown. Shuts down all services started during
 			// startup.
-			public void shutdown();
+			//public void shutdown();
 
 			// Gets the running flag that indicates server running status.
 			// @return running flag

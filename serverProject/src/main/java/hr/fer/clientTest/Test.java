@@ -1,5 +1,6 @@
 package hr.fer.clientTest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -20,8 +21,37 @@ public class Test {
 //		reg();		
 //		list();
 //		search();
-		store();
+		//store();
 		
+		String myString = "27,989,50,0,,0,";
+		String rcvString = "22,991,65,163,,0,";
+		
+		List<String> myList = new ArrayList<String>();
+		List<String> rcvList = new ArrayList<String>();
+		List<Integer> rez = new ArrayList<Integer>();		
+		
+		for (int i = 0; i < myString.split(",").length; i++) {
+			myList.add(myString.split(",")[i]);
+		}
+		for (int i = 0; i < rcvString.split(",").length; i++) {
+			rcvList.add(rcvString.split(",")[i]);
+		}
+		
+		for (int i = 0; i < myList.size(); i++) {
+			if (!myList.get(i).equals("")) {
+				int prvi = Integer.parseInt(myList.get(i));
+				if (!rcvList.get(i).equals("")) {
+					int drugi = Integer.parseInt(rcvList.get(i));
+					rez.add((prvi + drugi) / 2);
+				} else rez.add(prvi);
+			} else {
+				if (!rcvList.get(i).equals("")) {
+					int drugi = Integer.parseInt(rcvList.get(i));
+					rez.add(drugi);
+				} else rez.add(0);
+			}
+		}
+		for (int i : rez) System.out.println(i);		
 	}
 	
 	public static void reg() {

@@ -64,6 +64,24 @@ public class ServiceController {
 		
 	}
 	
+	@RequestMapping(value = "/deletion", method = RequestMethod.POST)
+	public boolean delete(@RequestBody String jsonStr) {
+
+		JSONObject jsonObject = new JSONObject(jsonStr);
+		if (jsonObject.has("username")) {
+			String username= jsonObject.getString("username");
+			for (Sensor s : sensors) {
+				if (s.getUsername().equals(username)) {
+					sensors.remove(s);
+					usernames.remove(username);
+					return true;
+				}
+			}
+		}
+		return false;
+		
+	}
+	
 	@RequestMapping(value = "/neighbour", method = RequestMethod.GET)
 	public String searchNeighbour(@RequestParam(value = "username")String username){
 		Sensor user = new Sensor();
@@ -71,7 +89,7 @@ public class ServiceController {
 			if (s.getUsername().equals(username)) user = s;
 		}
 		double d = 0;
-		Sensor closest = new Sensor();
+		Sensor closest = null;
 		for (Sensor s : sensors) {
 			if (s.getUsername().equals(username)) continue;
 			double tempD = distance(user, s);
@@ -80,6 +98,7 @@ public class ServiceController {
 				System.out.println("Distance between " + user.getUsername() + " and " + s.getUsername() + " is " + tempD);
 			}
 		}
+		if (closest == null) return "failed";
 		UserAddress address = new UserAddress(closest.getIPaddress(), closest.getPort());
 		ObjectMapper Obj = new ObjectMapper();
 		try {

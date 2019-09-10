@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
@@ -18,18 +19,16 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import hr.fer.serverProject.Sensor;
-
 public class Main {
 	
 	private final static double LAT_MIN = 45.75;
 	private final static double LAT_MAX = 45.85;
 	private final static double LON_MIN = 15.87;
 	private final static double LON_MAX = 16;
+	static List<String> mjerenja = new ArrayList<String>();
 
 	public static void main(String[] args) {
-		File file = new File("mjerenja.csv");
-		List<String> mjerenja = new ArrayList<String>();
+		File file = new File("C:\\Users\\ebrctnx\\OneDrive - fer.hr\\kolegiji\\RASSUS\\DZ\\RASSUS-dz1\\mjerenja.csv");
 		try (BufferedReader br = new BufferedReader(new FileReader(file))){
 			String line;
 			while ((line = br.readLine()) != null) {
@@ -39,6 +38,7 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		//System.out.println(mjerenja);
 		
 		Random r = new Random();
 		double lat = LAT_MIN + (LAT_MAX - LAT_MIN) * r.nextDouble();
@@ -46,13 +46,39 @@ public class Main {
 		
 		Scanner scan = new Scanner(System.in);  // Create a Scanner object
 	    System.out.println("Enter username:");
-	    String username = scan.next();
-	    System.out.println("Enter port");
+	    String username = scan.nextLine();
+	    System.out.println("Enter port:");
 	    int port = scan.nextInt();
 	    
 		scan.close();
 		
 		//Sensor sensor = new Sensor(username, lat, lon, "0.0.0.0", port);
+		
+		reg(username, lon, lat, port);
+		//list();
+		
+		MultithreadedServer server = new MultithreadedServer(username, port, mjerenja);
+		Thread t1 = new Thread(server, "t1");
+		t1.start();
+		FlexibleTCPClient client = new FlexibleTCPClient(username, mjerenja);
+		Thread t2 = new Thread(client, "t2");
+		t2.start();
+	}
+	
+	private static void list() {
+		final String uri = "http://localhost:8080/serverProject/rest/sensors";
+		
+		HttpHeaders headers = new HttpHeaders();
+		HttpEntity<String> entity = new HttpEntity<String>("", headers);
+		RestTemplate restTemplate = new RestTemplate();
+		
+		ResponseEntity<String> response = restTemplate
+				  .exchange(uri, HttpMethod.GET, entity, String.class);
+		//JSONObject userJson = new JSONObject(response.getBody());
+		System.out.println(response.getBody());
+	}
+
+	public static void reg(String username, double lon, double lat, int port) {
 		
 		final String regUri = "http://localhost:8080/serverProject/rest/register";
 		
@@ -60,7 +86,7 @@ public class Main {
 		request.put("username", username);
 		request.put("lon", lon);
 		request.put("lat", lat);
-		request.put("IP", "0.0.0.0");
+		request.put("IP", "127.0.0.1");
 		request.put("port", port);
 
 		// set headers
@@ -76,11 +102,5 @@ public class Main {
 			System.exit(1);
 		}
 		
-		MultithreadedServer server = new MultithreadedServer(username, port);
-		Thread t1 = new Thread(server, "t1");
-		t1.start();
-		FlexibleTCPClient client = new FlexibleTCPClient();
-		Thread t2 = new Thread(client, "t2");
-		t2.start();
 	}
 }
