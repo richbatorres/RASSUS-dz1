@@ -58,6 +58,7 @@ public class MultithreadedServer implements ServerIf, Runnable {
 
 	// Starts all required server services.
 	public void startup() {
+		System.out.println(this.username + ", " + this.port);
 		// create a server socket, bind it to the specified port on the local host
 		// and set the max backlog for client requests
 		try {
@@ -164,11 +165,11 @@ public class MultithreadedServer implements ServerIf, Runnable {
 	}
 
 	public void run() {
-		ServerIf server = new MultithreadedServer();
+		//ServerIf server = new MultithreadedServer();
 		//start all required services
-		server.startup();
+		this.startup();
 		//run the main loop for accepting client requests
-		server.loop();
+		this.loop();
 		//initiate shutdown when startup is finished
 //		server.shutdown();
 		

@@ -34,19 +34,19 @@ public class FlexibleTCPClient implements Runnable{
 	
 	private String username;
 	private int port;
+	private int neighbourPort = 0;
 
 	private List<String> mjerenja;
 	
-	public FlexibleTCPClient(String username, List<String> mjerenja) {
+	public FlexibleTCPClient(String username, List<String> mjerenja, int port) {
 		this.username = username;
 		this.mjerenja = mjerenja; 
+		this.port = port;
 	}
 
 	public void run() {          
 
 		Stopwatch stopwatch = Stopwatch.createStarted();
-
-		System.out.println("Insert command \"find\" to find a neighbour: ");
 
 		//String inputString;
 
@@ -56,24 +56,27 @@ public class FlexibleTCPClient implements Runnable{
 //				System.out.println("Wrong command!");
 //			}
 
-			String neighbour;
-			while ((neighbour = search(username)).equals("failed")) {
-				System.out.println("Could not find neighbour, trying again in 5 seconds");
-				try {
-					Thread.sleep(5000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			if (this.neighbourPort == 0) {
+				String neighbour;
+				while ((neighbour = search(username)).equals("failed")) {
+					System.out.println("Could not find neighbour, trying again in 5 seconds");
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
-			}
-			System.out.println("Succesfully found neighbour!");
-			System.out.println(neighbour);
+				System.out.println("Succesfully found neighbour!");
+			
+			System.out.println("Closest neighbour: " + neighbour);
 			JSONObject obj = new JSONObject(neighbour);
 			String serverName = (String) obj.get("ip");
-			port = (int) obj.get("port");
+			this.neighbourPort = (int) obj.get("port");
+			}
 
 			// create a client socket and connect it to the name server on the specified port number
-			try (Socket clientSocket = new Socket(serverName, port);/*SOCKET->CONNECT*/
+			try (Socket clientSocket = new Socket(serverName, this.neighbourPort);/*SOCKET->CONNECT*/
 					DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
 					DataInputStream inFromServer = new DataInputStream(clientSocket.getInputStream());) {
 

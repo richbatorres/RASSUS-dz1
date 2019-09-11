@@ -2,6 +2,7 @@ package hr.fer.clientTest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
@@ -22,36 +23,11 @@ public class Test {
 //		list();
 //		search();
 		//store();
+		//del();
 		
-		String myString = "27,989,50,0,,0,";
-		String rcvString = "22,991,65,163,,0,";
+		int nb;
+		System.out.println(nb);
 		
-		List<String> myList = new ArrayList<String>();
-		List<String> rcvList = new ArrayList<String>();
-		List<Integer> rez = new ArrayList<Integer>();		
-		
-		for (int i = 0; i < myString.split(",").length; i++) {
-			myList.add(myString.split(",")[i]);
-		}
-		for (int i = 0; i < rcvString.split(",").length; i++) {
-			rcvList.add(rcvString.split(",")[i]);
-		}
-		
-		for (int i = 0; i < myList.size(); i++) {
-			if (!myList.get(i).equals("")) {
-				int prvi = Integer.parseInt(myList.get(i));
-				if (!rcvList.get(i).equals("")) {
-					int drugi = Integer.parseInt(rcvList.get(i));
-					rez.add((prvi + drugi) / 2);
-				} else rez.add(prvi);
-			} else {
-				if (!rcvList.get(i).equals("")) {
-					int drugi = Integer.parseInt(rcvList.get(i));
-					rez.add(drugi);
-				} else rez.add(0);
-			}
-		}
-		for (int i : rez) System.out.println(i);		
 	}
 	
 	public static void reg() {
@@ -83,6 +59,24 @@ public class Test {
 		request.put("username", "Richbatorres");
 		request.put("parameter", "Pressure");
 		request.put("avgValue", 50.10);
+
+		// set headers
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<String> entity = new HttpEntity<String>(request.toString(), headers);
+		RestTemplate restTemplate = new RestTemplate();
+		
+		ResponseEntity<String> response = restTemplate
+				  .exchange(uri, HttpMethod.POST, entity, String.class);
+		//JSONObject userJson = new JSONObject(response.getBody());
+		System.out.println(response.getBody());
+	}
+	
+	public static void del() {
+		final String uri = "http://localhost:8080/serverProject/rest/deletion";
+		
+		JSONObject request = new JSONObject();
+		request.put("username", "rchbtrrs2");
 
 		// set headers
 		HttpHeaders headers = new HttpHeaders();
