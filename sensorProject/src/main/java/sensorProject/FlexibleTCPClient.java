@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Stopwatch;
 
@@ -34,7 +35,7 @@ public class FlexibleTCPClient implements Runnable{
 	
 	private String username;
 	private int port;
-	private int neighbourPort = 0;
+	private HashMap<String, String> neighbour;
 
 	private List<String> mjerenja;
 	
@@ -50,71 +51,131 @@ public class FlexibleTCPClient implements Runnable{
 
 		//String inputString;
 
-//		try (Scanner in = new Scanner(System.in);){
-//			while (!(inputString = in.nextLine()).equals("find") && inputString.length() != 0
-//					&& inputString != null) {
-//				System.out.println("Wrong command!");
+		//		try (Scanner in = new Scanner(System.in);){
+		//			while (!(inputString = in.nextLine()).equals("find") && inputString.length() != 0
+		//					&& inputString != null) {
+		//				System.out.println("Wrong command!");
+		//			}
+
+
+		
+//		if (this.neighbourPort == 0) {
+//			String neighbour;
+//			while ((neighbour = search(username)).equals("failed")) {
+//				System.out.println("Could not find neighbour, trying again in 5 seconds");
+//				try {
+//					Thread.sleep(5000);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 //			}
+//			System.out.println("Succesfully found neighbour!");
+//
+//			System.out.println("Closest neighbour: " + neighbour);
+//			JSONObject obj = new JSONObject(neighbour);
+//			String serverName = (String) obj.get("ip");
+//			this.neighbourPort = (int) obj.get("port");
+//		}
 
-			if (this.neighbourPort == 0) {
-				String neighbour;
-				while ((neighbour = search(username)).equals("failed")) {
-					System.out.println("Could not find neighbour, trying again in 5 seconds");
-					try {
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+		// create a client socket and connect it to the name server on the specified port number
+		Socket clientSocket = null;/*SOCKET->CONNECT*/
+		DataOutputStream outToServer = null;
+		DataInputStream inFromServer = null;
+
+		// get the socket's output stream and open a PrintWriter on it
+		//			PrintWriter outToServer = new PrintWriter(new OutputStreamWriter(
+		//					clientSocket.getOutputStream()), true);
+
+		// get the socket's input stream and open a BufferedReader on it
+		//			BufferedReader inFromServer = new BufferedReader(new InputStreamReader(
+		//					clientSocket.getInputStream()));
+
+		try {
+			System.out.println("Insert command: ");
+			Scanner in = new Scanner(System.in);
+			String inputString;
+			while (/*(inputString = in.nextLine())*/in.nextLine() != null) {
+				if (inputString.equals(Commands.FIND)) {
+					findNeigbour(username);
+					clientSocket = new Socket(neighbour.get("ip"), Integer.parseInt(neighbour.get("port")));
+					outToServer = new DataOutputStream(clientSocket.getOutputStream());
+					inFromServer = new DataInputStream(clientSocket.getInputStream());
+				}else if (inputString.equals(Commands.REQUEST)) {
+					request(outToServer, inFromServer, inputString, stopwatch);
+				}else if (inputString.equals(Commands.SHUTDOWN)) {
+					break;
 				}
-				System.out.println("Succesfully found neighbour!");
-			
-			System.out.println("Closest neighbour: " + neighbour);
-			JSONObject obj = new JSONObject(neighbour);
-			String serverName = (String) obj.get("ip");
-			this.neighbourPort = (int) obj.get("port");
-			}
 
-			// create a client socket and connect it to the name server on the specified port number
-			try (Socket clientSocket = new Socket(serverName, this.neighbourPort);/*SOCKET->CONNECT*/
-					DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-					DataInputStream inFromServer = new DataInputStream(clientSocket.getInputStream());) {
-
-				// get the socket's output stream and open a PrintWriter on it
-				//			PrintWriter outToServer = new PrintWriter(new OutputStreamWriter(
-				//					clientSocket.getOutputStream()), true);
-
-				// get the socket's input stream and open a BufferedReader on it
-				//			BufferedReader inFromServer = new BufferedReader(new InputStreamReader(
-				//					clientSocket.getInputStream()));
-
+				// send a String then terminate the line and flush
+				//					outToServer.writeUTF(inputString);//WRITE
+				//					outToServer.flush();
+				//					System.out.println("TCPClient sent: " + inputString);
+				//					// read a line of text received from server
+				//					String rcvString = inFromServer.readLine();//READ
+				//					System.out.println("TCPClient received: " + rcvString);
+				//					if (rcvString.equals("404")) continue;
+				//					int redniBroj = (int) ((stopwatch.elapsed(TimeUnit.SECONDS) % 100) + 2);
+				//					String myString = mjerenja.get(redniBroj);
+				//					calculateAndStore(rcvString, myString);
+				//					if (inputString.equals("shutdown"))
+				//						break;
 				System.out.println("Insert command: ");
-				BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-			    String inputString;
-				while ((inputString = in.readLine()) != null && inputString.length() != 0) {
-					// send a String then terminate the line and flush
-					outToServer.writeUTF(inputString);//WRITE
-					outToServer.flush();
-					System.out.println("TCPClient sent: " + inputString);
-					// read a line of text received from server
-					String rcvString = inFromServer.readLine();//READ
-					System.out.println("TCPClient received: " + rcvString);
-					if (rcvString.equals("404")) continue;
-					int redniBroj = (int) ((stopwatch.elapsed(TimeUnit.SECONDS) % 100) + 2);
-					String myString = mjerenja.get(redniBroj);
-					calculateAndStore(rcvString, myString);
-					if (inputString.equals("shutdown"))
-						break;
-					System.out.println("Insert command: ");
-				}
-
-			} catch (IOException ex) {
-				System.err.println("Exception caught when opening the socket or trying to read data: " + ex);
-				System.exit(1);
-			}//CLOSE
+			}
+			in.close();
+		} catch(IOException ex) {
+			System.err.println("Exception caught when opening the socket or trying to read data: " + ex);
+			System.exit(1);
+		}
 		//}
 	}
 	
+	private void request(DataOutputStream outToServer, DataInputStream inFromServer, String inputString, Stopwatch stopwatch) {
+		// send a String then terminate the line and flush
+		try {
+			outToServer.writeUTF(inputString);
+			//WRITE
+			outToServer.flush();
+			System.out.println("TCPClient sent: " + inputString);
+			// read a line of text received from server
+			String rcvString = inFromServer.readLine();//READ
+			System.out.println("TCPClient received: " + rcvString);
+			if (rcvString.equals("404")) return;
+			int redniBroj = (int) ((stopwatch.elapsed(TimeUnit.SECONDS) % 100) + 2);
+			String myString = mjerenja.get(redniBroj);
+			calculateAndStore(rcvString, myString);
+		} catch(IOException ex) {
+			System.err.println("Exception caught when opening the socket or trying to read data: " + ex);
+			System.exit(1);
+		}
+	}
+
+	private void findNeigbour(String username) {
+		String result;
+		while ((result = search(username)).equals("failed")) {
+			System.out.println("Could not find neighbour, trying again in 5 seconds");
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		System.out.println("Succesfully found neighbour!");
+
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			neighbour = mapper.readValue(result, new TypeReference<Map<String, String>>() {});
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Closest neighbour: " + neighbour.toString());
+//		JSONObject obj = new JSONObject(neighbour);
+//		this.serverName = (String) obj.get("ip");
+//		this.serverPort = (int) obj.get("port");
+	}
+
 	private void calculateAndStore(String rcvString, String myString) {
 		List<String> myList = new ArrayList<String>();
 		List<String> rcvList = new ArrayList<String>();
@@ -176,6 +237,5 @@ public class FlexibleTCPClient implements Runnable{
 		//JSONObject userJson = new JSONObject(response.getBody());
 		return response.getBody();
 	}
-
 	
 }

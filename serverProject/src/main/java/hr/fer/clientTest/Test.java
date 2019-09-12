@@ -24,9 +24,11 @@ public class Test {
 //		search();
 		//store();
 		//del();
-		
-		int nb;
-		System.out.println(nb);
+		System.out.println("neki k.. khm khm.. primjer");
+		Scanner scan = new Scanner(System.in);
+		while (!scan.nextLine().equals("drugi primjer")) {
+			System.out.println("ponovooo");
+		}
 		
 	}
 	
@@ -76,7 +78,7 @@ public class Test {
 		final String uri = "http://localhost:8080/serverProject/rest/deletion";
 		
 		JSONObject request = new JSONObject();
-		request.put("username", "rchbtrrs2");
+		request.put("username", "rchbtrrs4");
 
 		// set headers
 		HttpHeaders headers = new HttpHeaders();

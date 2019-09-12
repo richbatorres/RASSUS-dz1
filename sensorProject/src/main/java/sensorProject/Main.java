@@ -61,15 +61,15 @@ public class Main {
 		Thread t1 = new Thread(server, "t1");
 		t1.start();
 		FlexibleTCPClient client = new FlexibleTCPClient(username, mjerenja, port);
-		while (!scan.nextLine().equals("client start")) {
-			try {
-				System.out.println("Unknown command, try again in 3 seconds");
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+//		while (!scan.nextLine().equals("client start")) {
+//			try {
+//				System.out.println("Unknown command, try again in 3 seconds");
+//				Thread.sleep(3000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		Thread t2 = new Thread(client, "t2");
 		t2.start();
 	}
