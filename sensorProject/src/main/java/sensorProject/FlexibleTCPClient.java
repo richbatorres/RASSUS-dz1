@@ -95,7 +95,8 @@ public class FlexibleTCPClient implements Runnable{
 			System.out.println("Insert command: ");
 			Scanner in = new Scanner(System.in);
 			String inputString;
-			while (/*(inputString = in.nextLine())*/in.nextLine() != null) {
+			while (in.hasNext()) {
+				inputString = in.next();
 				if (inputString.equals(Commands.FIND)) {
 					findNeigbour(username);
 					clientSocket = new Socket(neighbour.get("ip"), Integer.parseInt(neighbour.get("port")));
@@ -148,32 +149,6 @@ public class FlexibleTCPClient implements Runnable{
 			System.err.println("Exception caught when opening the socket or trying to read data: " + ex);
 			System.exit(1);
 		}
-	}
-
-	private void findNeigbour(String username) {
-		String result;
-		while ((result = search(username)).equals("failed")) {
-			System.out.println("Could not find neighbour, trying again in 5 seconds");
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		System.out.println("Succesfully found neighbour!");
-
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			neighbour = mapper.readValue(result, new TypeReference<Map<String, String>>() {});
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("Closest neighbour: " + neighbour.toString());
-//		JSONObject obj = new JSONObject(neighbour);
-//		this.serverName = (String) obj.get("ip");
-//		this.serverPort = (int) obj.get("port");
 	}
 
 	private void calculateAndStore(String rcvString, String myString) {

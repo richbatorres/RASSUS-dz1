@@ -23,12 +23,15 @@ public class Test {
 //		list();
 //		search();
 		//store();
-		//del();
-		System.out.println("neki k.. khm khm.. primjer");
-		Scanner scan = new Scanner(System.in);
-		while (!scan.nextLine().equals("drugi primjer")) {
-			System.out.println("ponovooo");
-		}
+		del();
+//		System.out.println("neki k.. khm khm.. primjer");
+//		Scanner scan = new Scanner(System.in);
+//		String input;
+//		while (!(input = scan.nextLine()).equals("drugi primjer")) {
+//			System.out.println("ponovooo");
+//		}
+//		System.out.println(input);
+//		scan.close();
 		
 	}
 	

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -18,6 +19,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Main {
 	
@@ -50,7 +54,7 @@ public class Main {
 	    System.out.println("Enter port:");
 	    int port = scan.nextInt();
 	    
-		scan.close();
+		//scan.close();
 		
 		//Sensor sensor = new Sensor(username, lat, lon, "0.0.0.0", port);
 		
@@ -61,6 +65,12 @@ public class Main {
 		Thread t1 = new Thread(server, "t1");
 		t1.start();
 		FlexibleTCPClient client = new FlexibleTCPClient(username, mjerenja, port);
+		System.out.println("Insert command: ");
+		String inputString;
+		while (scan.hasNext()) {
+			inputString = scan.next();
+			if (inputString.equals(Commands.FIND)) {
+				findNeigbour(username);
 //		while (!scan.nextLine().equals("client start")) {
 //			try {
 //				System.out.println("Unknown command, try again in 3 seconds");
@@ -85,6 +95,32 @@ public class Main {
 				  .exchange(uri, HttpMethod.GET, entity, String.class);
 		//JSONObject userJson = new JSONObject(response.getBody());
 		System.out.println(response.getBody());
+	}
+	
+	private void findNeigbour(String username) {
+		String result;
+		while ((result = search(username)).equals("failed")) {
+			System.out.println("Could not find neighbour, trying again in 5 seconds");
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		System.out.println("Succesfully found neighbour!");
+
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			neighbour = mapper.readValue(result, new TypeReference<Map<String, String>>() {});
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Closest neighbour: " + neighbour.toString());
+//		JSONObject obj = new JSONObject(neighbour);
+//		this.serverName = (String) obj.get("ip");
+//		this.serverPort = (int) obj.get("port");
 	}
 
 	public static void reg(String username, double lon, double lat, int port) {
