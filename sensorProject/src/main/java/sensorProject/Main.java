@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,7 +33,9 @@ public class Main {
 	static List<String> mjerenja = new ArrayList<String>();
 
 	public static void main(String[] args) {
-		File file = new File("C:\\Users\\ebrctnx\\OneDrive - fer.hr\\kolegiji\\RASSUS\\DZ\\RASSUS-dz1\\mjerenja.csv");
+		Main main = new Main();
+        File file = main.getFileFromResources("mjerenja.csv");
+		//File file = new File(getClass().getClassLoader().getResource("mjerenja.csv").getFile());
 		try (BufferedReader br = new BufferedReader(new FileReader(file))){
 			String line;
 			while ((line = br.readLine()) != null) {
@@ -69,8 +72,14 @@ public class Main {
 		String inputString;
 		while (scan.hasNext()) {
 			inputString = scan.next();
-			if (inputString.equals(Commands.FIND)) {
-				findNeigbour(username);
+			if (inputString.equals(Commands.FIND.toString())) {
+				client.findNeigbour();
+			}else if (inputString.equals(Commands.REQ.toString())) {
+				Thread t2 = new Thread(client, "t2");
+				t2.start();
+			}
+			System.out.println("Insert command: ");
+		}
 //		while (!scan.nextLine().equals("client start")) {
 //			try {
 //				System.out.println("Unknown command, try again in 3 seconds");
@@ -84,6 +93,19 @@ public class Main {
 		t2.start();
 	}
 	
+	private File getFileFromResources(String fileName) {
+
+        ClassLoader classLoader = getClass().getClassLoader();
+
+        URL resource = classLoader.getResource(fileName);
+        if (resource == null) {
+            throw new IllegalArgumentException("file is not found!");
+        } else {
+            return new File(resource.getFile());
+        }
+
+    }
+
 	private static void list() {
 		final String uri = "http://localhost:8080/serverProject/rest/sensors";
 		
@@ -95,32 +117,6 @@ public class Main {
 				  .exchange(uri, HttpMethod.GET, entity, String.class);
 		//JSONObject userJson = new JSONObject(response.getBody());
 		System.out.println(response.getBody());
-	}
-	
-	private void findNeigbour(String username) {
-		String result;
-		while ((result = search(username)).equals("failed")) {
-			System.out.println("Could not find neighbour, trying again in 5 seconds");
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		System.out.println("Succesfully found neighbour!");
-
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			neighbour = mapper.readValue(result, new TypeReference<Map<String, String>>() {});
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("Closest neighbour: " + neighbour.toString());
-//		JSONObject obj = new JSONObject(neighbour);
-//		this.serverName = (String) obj.get("ip");
-//		this.serverPort = (int) obj.get("port");
 	}
 
 	public static void reg(String username, double lon, double lat, int port) {

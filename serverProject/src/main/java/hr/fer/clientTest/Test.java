@@ -81,7 +81,7 @@ public class Test {
 		final String uri = "http://localhost:8080/serverProject/rest/deletion";
 		
 		JSONObject request = new JSONObject();
-		request.put("username", "rchbtrrs4");
+		request.put("username", "rchbtrrs1");
 
 		// set headers
 		HttpHeaders headers = new HttpHeaders();

@@ -102,7 +102,7 @@ public class MultithreadedServer implements ServerIf, Runnable {
 						//System.out.println("Server received: " + receivedString);
 
 						//shutdown the server if requested
-						if (receivedString.contains("shutdown")) {
+						if (receivedString.contains(Commands.SHUTDOWN.toString())) {
 							outToClient.writeUTF("Connection closing...");//WRITE
 							outToClient.flush();
 							//System.out.println("Server sent: Initiating server shutdown!");
@@ -111,7 +111,7 @@ public class MultithreadedServer implements ServerIf, Runnable {
 							clientSocket.close();
 							activeConnections.getAndDecrement();
 							return;
-						}else if (receivedString.contains("req")) {
+						}else if (receivedString.contains(Commands.REQ.toString())) {
 
 							int redniBroj = (int) ((stopwatch.elapsed(TimeUnit.SECONDS) % 100) + 2);
 							String stringToSend = mjerenja.get(redniBroj);
