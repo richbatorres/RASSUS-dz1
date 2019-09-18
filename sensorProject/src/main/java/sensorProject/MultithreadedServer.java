@@ -175,15 +175,4 @@ public class MultithreadedServer implements ServerIf, Runnable {
 		
 	}
 
-//	public static void main(String[] args) {
-//		ServerIf server = new MultithreadedServer();
-//		//start all required services
-//		server.startup();
-//		//run the main loop for accepting client requests
-//		server.loop();
-//		//initiate shutdown when startup is finished
-//		server.shutdown();
-//
-//	}
-
 }

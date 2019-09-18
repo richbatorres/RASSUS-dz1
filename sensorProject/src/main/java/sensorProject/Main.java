@@ -91,6 +91,7 @@ public class Main {
 //		}
 		Thread t2 = new Thread(client, "t2");
 		t2.start();
+		scan.close();
 	}
 	
 	private File getFileFromResources(String fileName) {
