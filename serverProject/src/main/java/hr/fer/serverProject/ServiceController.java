@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONObject;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,13 +13,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 @RestController
 public class ServiceController {
+	
+	private static final Log log = LogFactory.getLog(ServiceController.class);
 
-	private static final String SUCCESS_STATUS = "success";
-	private static final String ERROR_STATUS = "error";
-	private static final int POST_CODE_SUCCESS = 100;
-	private static final int AUTH_FAILURE = 102;
+//	private static final String SUCCESS_STATUS = "success";
+//	private static final String ERROR_STATUS = "error";
+//	private static final int POST_CODE_SUCCESS = 100;
+//	private static final int AUTH_FAILURE = 102;
 	public List<Sensor> sensors = new ArrayList<Sensor>();
 	public List<String> usernames = new ArrayList<String>();
 	
@@ -58,7 +60,7 @@ public class ServiceController {
 			}else return false;
 			String parameter = jsonObject.getString("parameter");
 			float avgValue = jsonObject.getFloat("avgValue");
-			System.out.println(username + parameter + avgValue);
+			log.info(username + ", " + parameter + ", " + avgValue);
 			return true;
 		}else return false;
 		
@@ -95,7 +97,7 @@ public class ServiceController {
 			double tempD = distance(user, s);
 			if (tempD < d || d == 0) {
 				closest = s;
-				System.out.println("Distance between " + user.getUsername() + " and " + s.getUsername() + " is " + tempD);
+				log.info("Distance between " + user.getUsername() + " and " + s.getUsername() + " is " + tempD);
 			}
 		}
 		if (closest == null) return "failed";
@@ -123,7 +125,6 @@ public class ServiceController {
 
 	@RequestMapping(value = "/sensors", method = RequestMethod.GET)
 	public String listSensors(){
-		//return new ResponseEntity<List>(sensors, HttpStatus.OK);
 		ObjectMapper Obj = new ObjectMapper();
 		String jsonStr = null;
 		try {
@@ -131,8 +132,7 @@ public class ServiceController {
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
-		//System.out.println(jsonStr);
+		}
 		return jsonStr.toString();
 	}	
 	

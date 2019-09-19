@@ -6,18 +6,28 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.google.common.base.Stopwatch;
+
 public class Worker implements Runnable{
+	private static final String NOT_FOUND = "404";
+	
 	private final Socket clientSocket;
 	private final AtomicBoolean isRunning;
 	private final AtomicInteger activeConnections;
+	private List<String> mjerenja;
+	private Stopwatch stopwatch;
 
-	public Worker(Socket clientSocket, AtomicBoolean isRunning, AtomicInteger activeConnections) {
+	public Worker(Socket clientSocket, AtomicBoolean isRunning, AtomicInteger activeConnections, List<String> mjerenja, Stopwatch stopwatch) {
 		this.clientSocket = clientSocket;
 		this.isRunning = isRunning;
 		this.activeConnections = activeConnections;
+		this.mjerenja = mjerenja;
+		this.stopwatch = stopwatch;
 	}
 
 	@Override
@@ -36,19 +46,21 @@ public class Worker implements Runnable{
 				System.out.println("Server received: " + receivedString);
 
 				//shutdown the server if requested
-				if (receivedString.contains("shutdown")) {
+				if (receivedString.contains(Commands.SHUTDOWN.toString())) {
 					outToClient.println("Initiating server shutdown!");//WRITE
 					System.out.println("Server sent: Initiating server shutdown!");
 					isRunning.set(false);
 					activeConnections.getAndDecrement();
-					return;
+					break;
+				}else if (receivedString.contains(Commands.REQ.toString())) {
+					int redniBroj = (int) ((stopwatch.elapsed(TimeUnit.SECONDS) % 100) + 2);
+					String stringToSend = mjerenja.get(redniBroj);
+					outToClient.println(stringToSend);
+					System.out.println("Server sent: " + stringToSend);
+				}else {
+					outToClient.println(NOT_FOUND);
+					System.out.println("Server sent: " + NOT_FOUND);
 				}
-
-				String stringToSend = receivedString.toUpperCase();
-
-				// send a String then terminate the line and flush
-				outToClient.println(stringToSend);//WRITE
-				System.out.println("Server sent: " + stringToSend);
 			}
 			activeConnections.getAndDecrement();
 		} catch (IOException ex) {

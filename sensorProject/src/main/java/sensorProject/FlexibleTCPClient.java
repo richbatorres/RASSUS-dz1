@@ -1,8 +1,6 @@
 package sensorProject;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -12,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
@@ -34,15 +31,13 @@ import com.google.common.base.Stopwatch;
 public class FlexibleTCPClient implements Runnable{
 	
 	private String username;
-	private int port;
 	private HashMap<String, String> neighbour;
 
 	private List<String> mjerenja;
 	
-	public FlexibleTCPClient(String username, List<String> mjerenja, int port) {
+	public FlexibleTCPClient(String username, List<String> mjerenja) {
 		this.username = username;
-		this.mjerenja = mjerenja; 
-		this.port = port;
+		this.mjerenja = mjerenja;
 	}
 
 	public void run() {          
@@ -70,87 +65,14 @@ public class FlexibleTCPClient implements Runnable{
 				String rcvString = inFromServer.readLine();//READ
 				System.out.println("TCPClient received: " + rcvString);
 				if (rcvString.equals("404")) continue;
-				int redniBroj = (int) ((stopwatch.elapsed(TimeUnit.SECONDS) % 100) + 2);
+				int redniBroj = (int) ((int)((int)stopwatch.elapsed(TimeUnit.SECONDS) % 100) + 2);
 				String myString = mjerenja.get(redniBroj);
 				calculateAndStore(rcvString, myString);
 			}
 		}catch (IOException ex) {
 			System.err.println("Exception caught when opening the socket or trying to read data: " + ex);
 			System.exit(1);
-		}//CLOSE
-
-		//		try (Scanner in = new Scanner(System.in);){
-		//			while (!(inputString = in.nextLine()).equals("find") && inputString.length() != 0
-		//					&& inputString != null) {
-		//				System.out.println("Wrong command!");
-		//			}
-
-
-		
-//		if (this.neighbourPort == 0) {
-//			String neighbour;
-//			while ((neighbour = search(username)).equals("failed")) {
-//				System.out.println("Could not find neighbour, trying again in 5 seconds");
-//				try {
-//					Thread.sleep(5000);
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			}
-//			System.out.println("Succesfully found neighbour!");
-//
-//			System.out.println("Closest neighbour: " + neighbour);
-//			JSONObject obj = new JSONObject(neighbour);
-//			String serverName = (String) obj.get("ip");
-//			this.neighbourPort = (int) obj.get("port");
-//		}
-
-		// get the socket's output stream and open a PrintWriter on it
-		//			PrintWriter outToServer = new PrintWriter(new OutputStreamWriter(
-		//					clientSocket.getOutputStream()), true);
-
-		// get the socket's input stream and open a BufferedReader on it
-		//			BufferedReader inFromServer = new BufferedReader(new InputStreamReader(
-		//					clientSocket.getInputStream()));
-
-//		try {
-//			System.out.println("Insert command: ");
-//			Scanner in = new Scanner(System.in);
-//			String inputString;
-//			while (in.hasNext()) {
-//				inputString = in.next();
-//				if (inputString.equals(Commands.FIND)) {
-//					findNeigbour(username);
-//					clientSocket = new Socket(neighbour.get("ip"), Integer.parseInt(neighbour.get("port")));
-//					outToServer = new DataOutputStream(clientSocket.getOutputStream());
-//					inFromServer = new DataInputStream(clientSocket.getInputStream());
-//				}else if (inputString.equals(Commands.REQUEST)) {
-//					request(outToServer, inFromServer, inputString, stopwatch);
-//				}else if (inputString.equals(Commands.SHUTDOWN)) {
-//					break;
-//				}
-
-				// send a String then terminate the line and flush
-				//					outToServer.writeUTF(inputString);//WRITE
-				//					outToServer.flush();
-				//					System.out.println("TCPClient sent: " + inputString);
-				//					// read a line of text received from server
-				//					String rcvString = inFromServer.readLine();//READ
-				//					System.out.println("TCPClient received: " + rcvString);
-				//					if (rcvString.equals("404")) continue;
-				//					int redniBroj = (int) ((stopwatch.elapsed(TimeUnit.SECONDS) % 100) + 2);
-				//					String myString = mjerenja.get(redniBroj);
-				//					calculateAndStore(rcvString, myString);
-				//					if (inputString.equals("shutdown"))
-				//						break;
-//			}
-//			in.close();
-//		} catch(IOException ex) {
-//			System.err.println("Exception caught when opening the socket or trying to read data: " + ex);
-//			System.exit(1);
-//		}
-		//}
+		}
 	}
 	
 	void findNeigbour() {
@@ -174,53 +96,23 @@ public class FlexibleTCPClient implements Runnable{
 			e.printStackTrace();
 		}
 		System.out.println("Closest neighbour: " + neighbour.toString());
-//		JSONObject obj = new JSONObject(neighbour);
-//		this.serverName = (String) obj.get("ip");
-//		this.serverPort = (int) obj.get("port");
 	}
-	
-//	private void request(DataOutputStream outToServer, DataInputStream inFromServer, String inputString, Stopwatch stopwatch) {
-//		// send a String then terminate the line and flush
-//		try {
-//			outToServer.writeUTF(inputString);
-//			//WRITE
-//			outToServer.flush();
-//			System.out.println("TCPClient sent: " + inputString);
-//			// read a line of text received from server
-//			String rcvString = inFromServer.readLine();//READ
-//			System.out.println("TCPClient received: " + rcvString);
-//			if (rcvString.equals("404")) return;
-//			int redniBroj = (int) ((stopwatch.elapsed(TimeUnit.SECONDS) % 100) + 2);
-//			String myString = mjerenja.get(redniBroj);
-//			calculateAndStore(rcvString, myString);
-//		} catch(IOException ex) {
-//			System.err.println("Exception caught when opening the socket or trying to read data: " + ex);
-//			System.exit(1);
-//		}
-//	}
 
 	private void calculateAndStore(String rcvString, String myString) {
-		List<String> myList = new ArrayList<String>();
-		List<String> rcvList = new ArrayList<String>();
-		List<Integer> rez = new ArrayList<Integer>();		
+		String[] myValues = myString.split(",");
+		String[] rcvValues = rcvString.split(",");
+		List<Integer> rez = new ArrayList<Integer>();
 		
-		for (int i = 0; i < myString.split(",").length; i++) {
-			myList.add(myString.split(",")[i]);
-		}
-		for (int i = 0; i < rcvString.split(",").length; i++) {
-			rcvList.add(rcvString.split(",")[i]);
-		}
-		
-		for (int i = 0; i < myList.size(); i++) {
-			if (myList.get(i) != "") {
-				int prvi = Integer.parseInt(myList.get(i));
-				if (rcvList.get(i) != "") {
-					int drugi = Integer.parseInt(rcvList.get(i));
+		for (int i = 0; i < myValues.length; i++) {
+			if (!myValues[i].equals("")) {
+				int prvi = Integer.parseInt(myValues[i]);
+				if (!rcvValues[i].equals("")) {
+					int drugi = Integer.parseInt(rcvValues[i]);
 					rez.add((prvi + drugi) / 2);
 				} else rez.add(prvi);
 			} else {
-				if (rcvList.get(i) != "") {
-					int drugi = Integer.parseInt(rcvList.get(i));
+				if (!rcvValues[i].equals("")) {
+					int drugi = Integer.parseInt(rcvValues[i]);
 					rez.add(drugi);
 				} else rez.add(0);
 			}
@@ -232,7 +124,6 @@ public class FlexibleTCPClient implements Runnable{
 		RestTemplate restTemplate = new RestTemplate();
 		
 		String[] params = mjerenja.get(0).split(",");
-		//Map<String, Integer> paramsAndValues = new HashMap<String, Integer>();
 		for (int i=0; i<rez.size(); i++) {
 			JSONObject request = new JSONObject();
 			request.put("username", username);
@@ -257,7 +148,6 @@ public class FlexibleTCPClient implements Runnable{
 		
 		ResponseEntity<String> response = restTemplate
 				  .exchange(uri, HttpMethod.GET, entity, String.class);
-		//JSONObject userJson = new JSONObject(response.getBody());
 		return response.getBody();
 	}
 	

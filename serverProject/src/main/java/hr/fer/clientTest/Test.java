@@ -2,36 +2,38 @@ package hr.fer.clientTest;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import hr.fer.serverProject.Sensor;
+import com.google.common.base.Stopwatch;
 
 public class Test {
 
 	public static void main(String[] args) {
 		
 //		reg();		
-//		list();
+		//list();
 //		search();
 		//store();
-		del();
-//		System.out.println("neki k.. khm khm.. primjer");
-//		Scanner scan = new Scanner(System.in);
-//		String input;
-//		while (!(input = scan.nextLine()).equals("drugi primjer")) {
-//			System.out.println("ponovooo");
-//		}
-//		System.out.println(input);
-//		scan.close();
+		//del();
+		
+		Stopwatch stopwatch = Stopwatch.createStarted();		
+		while (true) {
+			System.out.println((int) ((stopwatch.elapsed(TimeUnit.SECONDS) % 100) + 2));
+			try {
+				Thread.sleep(3400);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 	}
 	
@@ -81,7 +83,7 @@ public class Test {
 		final String uri = "http://localhost:8080/serverProject/rest/deletion";
 		
 		JSONObject request = new JSONObject();
-		request.put("username", "rchbtrrs1");
+		request.put("username", "rchbtrrs2");
 
 		// set headers
 		HttpHeaders headers = new HttpHeaders();

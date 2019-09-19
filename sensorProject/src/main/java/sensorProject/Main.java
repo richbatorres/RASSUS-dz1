@@ -2,14 +2,11 @@ package sensorProject;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -20,9 +17,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Main {
 	
@@ -35,7 +29,6 @@ public class Main {
 	public static void main(String[] args) {
 		Main main = new Main();
         File file = main.getFileFromResources("mjerenja.csv");
-		//File file = new File(getClass().getClassLoader().getResource("mjerenja.csv").getFile());
 		try (BufferedReader br = new BufferedReader(new FileReader(file))){
 			String line;
 			while ((line = br.readLine()) != null) {
@@ -45,7 +38,6 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//System.out.println(mjerenja);
 		
 		Random r = new Random();
 		double lat = LAT_MIN + (LAT_MAX - LAT_MIN) * r.nextDouble();
@@ -56,69 +48,40 @@ public class Main {
 	    String username = scan.nextLine();
 	    System.out.println("Enter port:");
 	    int port = scan.nextInt();
-	    
-		//scan.close();
-		
-		//Sensor sensor = new Sensor(username, lat, lon, "0.0.0.0", port);
 		
 		reg(username, lon, lat, port);
-		//list();
 		
 		MultithreadedServer server = new MultithreadedServer(username, port, mjerenja);
 		Thread t1 = new Thread(server, "t1");
 		t1.start();
-		FlexibleTCPClient client = new FlexibleTCPClient(username, mjerenja, port);
+		FlexibleTCPClient client = new FlexibleTCPClient(username, mjerenja/*, port*/);
 		System.out.println("Insert command: ");
 		String inputString;
 		while (scan.hasNext()) {
 			inputString = scan.next();
 			if (inputString.equals(Commands.FIND.toString())) {
 				client.findNeigbour();
-			}else if (inputString.equals(Commands.REQ.toString())) {
+			}else if (inputString.equals(Commands.START.toString())) {
 				Thread t2 = new Thread(client, "t2");
 				t2.start();
 			}
 			System.out.println("Insert command: ");
 		}
-//		while (!scan.nextLine().equals("client start")) {
-//			try {
-//				System.out.println("Unknown command, try again in 3 seconds");
-//				Thread.sleep(3000);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
-		Thread t2 = new Thread(client, "t2");
-		t2.start();
 		scan.close();
 	}
 	
 	private File getFileFromResources(String fileName) {
 
-        ClassLoader classLoader = getClass().getClassLoader();
+        //ClassLoader classLoader = getClass().getClassLoader();
 
-        URL resource = classLoader.getResource(fileName);
-        if (resource == null) {
-            throw new IllegalArgumentException("file is not found!");
-        } else {
-            return new File(resource.getFile());
-        }
+        String resource = "C:\\Users\\ebrctnx\\OneDrive - fer.hr\\kolegiji\\RASSUS\\DZ\\RASSUS-dz1\\sensorProject\\target\\classes\\mjerenja.csv";
+//        if (resource == null) {
+//            throw new IllegalArgumentException("file is not found!");
+//        } else {
+            return new File(resource);
+//        }
 
     }
-
-	private static void list() {
-		final String uri = "http://localhost:8080/serverProject/rest/sensors";
-		
-		HttpHeaders headers = new HttpHeaders();
-		HttpEntity<String> entity = new HttpEntity<String>("", headers);
-		RestTemplate restTemplate = new RestTemplate();
-		
-		ResponseEntity<String> response = restTemplate
-				  .exchange(uri, HttpMethod.GET, entity, String.class);
-		//JSONObject userJson = new JSONObject(response.getBody());
-		System.out.println(response.getBody());
-	}
 
 	public static void reg(String username, double lon, double lat, int port) {
 		
@@ -139,7 +102,6 @@ public class Main {
 		
 		ResponseEntity<String> response = restTemplate
 				  .exchange(regUri, HttpMethod.POST, entity, String.class);
-		//JSONObject userJson = new JSONObject(response.getBody());
 		if (!Boolean.parseBoolean(response.getBody())) {
 			System.exit(1);
 		}
