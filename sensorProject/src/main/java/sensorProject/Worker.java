@@ -22,6 +22,14 @@ public class Worker implements Runnable{
 	private List<String> mjerenja;
 	private Stopwatch stopwatch;
 
+	/**
+	 * Creates new Worker instance with given values:
+	 * @param clientSocket socket for communication with client
+	 * @param isRunning 
+	 * @param activeConnections number of active connections on MutithreadedServer
+	 * @param mjerenja list of generated measurments
+	 * @param stopwatch measures time since start of the procces
+	 */
 	public Worker(Socket clientSocket, AtomicBoolean isRunning, AtomicInteger activeConnections, List<String> mjerenja, Stopwatch stopwatch) {
 		this.clientSocket = clientSocket;
 		this.isRunning = isRunning;

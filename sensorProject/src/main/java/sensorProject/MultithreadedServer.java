@@ -32,6 +32,13 @@ public class MultithreadedServer implements ServerIf, Runnable {
 	private final AtomicBoolean runningFlag;
 	private List<String> mjerenja;
 
+	/**
+	 * Creates new instance of multithreaded sensor server with given
+	 * values:
+	 * @param username sensor username
+	 * @param port sensor port
+	 * @param mjerenja list of generated measurments
+	 */
 	public MultithreadedServer(String username, int port, List<String> mjerenja) {
 		activeConnections = new AtomicInteger(0);
 		executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
@@ -41,6 +48,9 @@ public class MultithreadedServer implements ServerIf, Runnable {
 		this.mjerenja = mjerenja;
 	}
 	
+	/**
+	 * Creates new instance if mutithreaded sensor server without any params
+	 */
 	public MultithreadedServer() {
 		activeConnections = new AtomicInteger(0);
 		executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);

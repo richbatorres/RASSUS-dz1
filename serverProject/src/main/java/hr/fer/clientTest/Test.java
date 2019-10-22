@@ -22,18 +22,18 @@ public class Test {
 		//list();
 //		search();
 		//store();
-		//del();
+		del();
 		
-		Stopwatch stopwatch = Stopwatch.createStarted();		
-		while (true) {
-			System.out.println((int) ((stopwatch.elapsed(TimeUnit.SECONDS) % 100) + 2));
-			try {
-				Thread.sleep(3400);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+//		Stopwatch stopwatch = Stopwatch.createStarted();		
+//		while (true) {
+//			System.out.println((int) ((stopwatch.elapsed(TimeUnit.SECONDS) % 100) + 2));
+//			try {
+//				Thread.sleep(3400);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		
 	}
 	
@@ -83,7 +83,7 @@ public class Test {
 		final String uri = "http://localhost:8080/serverProject/rest/deletion";
 		
 		JSONObject request = new JSONObject();
-		request.put("username", "rchbtrrs2");
+		request.put("username", "rchbtrrs1");
 
 		// set headers
 		HttpHeaders headers = new HttpHeaders();

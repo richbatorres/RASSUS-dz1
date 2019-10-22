@@ -28,6 +28,11 @@ public class ServiceController {
 	public List<Sensor> sensors = new ArrayList<Sensor>();
 	public List<String> usernames = new ArrayList<String>();
 	
+	/**
+	 * Web service for registering sensors to server
+	 * @param jsonStr JSON object that contains info about sensor
+	 * @return true if registration was successful
+	 */
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
 	public boolean register(@RequestBody String jsonStr) {
 		
@@ -49,6 +54,12 @@ public class ServiceController {
 		
 	}
 	
+	/**
+	 * Web service for storing measured data on server
+	 * @param jsonStr JSON object that contains one measured data
+	 * @return true if storing was successful, 
+	 * e.g. if sent JSON object had necessary fields
+	 */
 	@RequestMapping(value = "/measurment", method = RequestMethod.POST)
 	public boolean storeMeasurment(@RequestBody String jsonStr) {
 
@@ -66,6 +77,12 @@ public class ServiceController {
 		
 	}
 	
+	/**
+	 * Web service for deleting one sensor from server registery
+	 * @param jsonStr JSON object that contains username of the 
+	 * sensor to be deleted
+	 * @return true if deletion of sensor was successful
+	 */
 	@RequestMapping(value = "/deletion", method = RequestMethod.POST)
 	public boolean delete(@RequestBody String jsonStr) {
 
@@ -84,6 +101,13 @@ public class ServiceController {
 		
 	}
 	
+	/**
+	 * Web service for finding the closest neighbour sensor to 
+	 * the sensor whose username is in @param username
+	 * @param username username of the sensor who is looking 
+	 * for the closest neighbour
+	 * @return JSON string of the address of the closest neighbour
+	 */
 	@RequestMapping(value = "/neighbour", method = RequestMethod.GET)
 	public String searchNeighbour(@RequestParam(value = "username")String username){
 		Sensor user = new Sensor();
@@ -112,6 +136,12 @@ public class ServiceController {
 		return "failed";
 	}
 	
+	/**
+	 * Method that calculates distance between 2 sensors
+	 * @param s1 first sensor
+	 * @param s2 second sensor
+	 * @return double value of calculated distance
+	 */
 	private double distance(Sensor s1, Sensor s2) {
 		
 		int r = 6371;
@@ -123,6 +153,10 @@ public class ServiceController {
 		
 	}
 
+	/**
+	 * Web service that list all registered sensors
+	 * @return JSON string that contains usernames of all registered sensors
+	 */
 	@RequestMapping(value = "/sensors", method = RequestMethod.GET)
 	public String listSensors(){
 		ObjectMapper Obj = new ObjectMapper();

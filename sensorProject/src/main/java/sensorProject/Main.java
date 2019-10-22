@@ -70,19 +70,25 @@ public class Main {
 		scan.close();
 	}
 	
+	/**
+	 * Method that gets the file from project resources
+	 * @param fileName name of the file to fetch in 
+	 * project resources
+	 * @return fetched file
+	 */
 	private File getFileFromResources(String fileName) {
-
-        //ClassLoader classLoader = getClass().getClassLoader();
-
-        String resource = "C:\\Users\\ebrctnx\\OneDrive - fer.hr\\kolegiji\\RASSUS\\DZ\\RASSUS-dz1\\sensorProject\\target\\classes\\mjerenja.csv";
-//        if (resource == null) {
-//            throw new IllegalArgumentException("file is not found!");
-//        } else {
-            return new File(resource);
-//        }
-
+        String resource = "C:\\Users\\ebrctnx\\OneDrive - fer.hr\\"
+        		+ "kolegiji\\RASSUS\\DZ\\RASSUS-dz1\\sensorProject\\target\\classes\\mjerenja.csv";
+        return new File(resource);
     }
 
+	/**
+	 * Method that request a web service for registering sensor to server
+	 * @param username sensor username
+	 * @param lon sensor longitude
+	 * @param lat sensor latitude
+	 * @param port sensor port
+	 */
 	public static void reg(String username, double lon, double lat, int port) {
 		
 		final String regUri = "http://localhost:8080/serverProject/rest/register";

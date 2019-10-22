@@ -35,6 +35,11 @@ public class FlexibleTCPClient implements Runnable{
 
 	private List<String> mjerenja;
 	
+	/**
+	 * Creates new instance of FlexibleTCPClient
+	 * @param username sensor username
+	 * @param mjerenja list of generated measurments
+	 */
 	public FlexibleTCPClient(String username, List<String> mjerenja) {
 		this.username = username;
 		this.mjerenja = mjerenja;
@@ -75,6 +80,10 @@ public class FlexibleTCPClient implements Runnable{
 		}
 	}
 	
+	/**
+	 * Requests web service from server to find the sensor that is 
+	 * geographically closest to this one
+	 */
 	void findNeigbour() {
 		String result;
 		while ((result = search(username)).equals("failed")) {
@@ -98,6 +107,13 @@ public class FlexibleTCPClient implements Runnable{
 		System.out.println("Closest neighbour: " + neighbour.toString());
 	}
 
+	/**
+	 * Calculates average values of mesurments from this sensor and
+	 * measurments from the closest neighbour and uses web service to 
+	 * store them on a server
+	 * @param rcvString measurments recieved from neighbour
+	 * @param myString own measurments
+	 */
 	private void calculateAndStore(String rcvString, String myString) {
 		String[] myValues = myString.split(",");
 		String[] rcvValues = rcvString.split(",");
@@ -139,6 +155,11 @@ public class FlexibleTCPClient implements Runnable{
 		
 	}
 
+	/**
+	 * Searches for a closest neighbour sensor on server
+	 * @param username own sensor username
+	 * @return address of the returned closest neighbour sensor
+	 */
 	public static String search(String username) {
 		final String uri = "http://localhost:8080/serverProject/rest/neighbour?username=" + username;
 		
