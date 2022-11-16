@@ -59,7 +59,7 @@
        <maven.compiler.source>1.8</maven.compiler.source>
        <maven.compiler.target>1.8</maven.compiler.target>
        <springframework.version>4.3.0.RELEASE</springframework.version>
-       <jackson.library>2.7.5</jackson.library>
+       <jackson.library>2.12.7.1</jackson.library>
   </properties>
   <build>
     <finalName>sensorProject</finalName>
